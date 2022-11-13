@@ -2,7 +2,7 @@ package com.calendarfx.app;
 import com.calendarfx.model.Calendar;
 import java.io.Serializable;
 
-public class User  implements Serializable {
+public class User implements Serializable {
 
     //default serialVersion id
     private static final long serialVersionUID = 1L;
@@ -43,6 +43,6 @@ public class User  implements Serializable {
     @Override
     public String toString() {
         return new StringBuffer(" Name: ").append(this.name)
-                .append(" Password : ").append(this.password).append(" Calendar : ").append(this.calendar.toString()).toString();
+                .append("\nPassword: ").append(this.password).append("\nCalendar: ").append(this.calendar.toString()).toString();
     }
 }
