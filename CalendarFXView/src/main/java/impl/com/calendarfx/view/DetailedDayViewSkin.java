@@ -32,11 +32,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.OverrunStyle;
 import javafx.scene.control.ScrollBar;
 import javafx.scene.control.Separator;
-import javafx.scene.layout.ColumnConstraints;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.Region;
-import javafx.scene.layout.RowConstraints;
+import javafx.scene.layout.*;
 
 import static com.calendarfx.util.ViewHelper.scrollToRequestedTime;
 
@@ -58,15 +54,20 @@ public class DetailedDayViewSkin extends DateControlSkin<DetailedDayView> {
     private final ColumnConstraints col3;
     private final ColumnConstraints col4;
 
+    private VBox entryBox;
+
     public DetailedDayViewSkin(DetailedDayView view) {
         super(view);
 
         scrollBar = new ScrollBar();
 
+
         // the day view (scroll pane)
         DayView dayView = view.getDayView();
         dayViewScrollPane = new DayViewScrollPane(dayView, scrollBar);
+
         dayViewScrollPane.getStyleClass().addAll("calendar-scroll-pane", "day-view-scroll-pane");
+
 
         // the timescale
         TimeScaleView timeScale = view.getTimeScaleView();
@@ -194,6 +195,8 @@ public class DetailedDayViewSkin extends DateControlSkin<DetailedDayView> {
         gridPane.add(dayViewScrollPane, 1, 2);
 
         if (view.isShowScrollBar()) {
+            Label promptLabel = new Label("Double-click area to add entry...");
+            gridPane.add(promptLabel, 1,0);
             gridPane.add(scrollBar, 2, 2);
         }
 
