@@ -451,7 +451,7 @@ public class AgendaView extends DateControl {
 
                     Label timeLabel = createEntryTimeLabel(entry);
                     timeLabel.setMinWidth(0);
-                    gridPane.add(timeLabel, 2, row);
+                    //gridPane.add(timeLabel, 2, row);
 
                     if (count > 1 && i < count - 1) {
                         Region separator = new Region();
@@ -484,6 +484,7 @@ public class AgendaView extends DateControl {
                 timeLabel.setOnMouseClicked(evt -> fireEvent(new RequestEvent(this, this, entry)));
                 timeLabel.getStyleClass().add("date-hyperlink");
             }
+
             return timeLabel;
         }
 
@@ -518,7 +519,7 @@ public class AgendaView extends DateControl {
          */
         protected Node createEntryGraphic(Entry<?> entry) {
             Circle circle = new Circle(4);
-            circle.getStyleClass().add(entry.getCalendar().getStyle() + "-icon");
+            //circle.getStyleClass().add(entry.getCalendar().getStyle() + "-icon");
             return circle;
         }
 

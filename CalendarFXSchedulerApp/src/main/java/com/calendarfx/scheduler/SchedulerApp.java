@@ -57,7 +57,6 @@ public class SchedulerApp extends Application {
         ToggleButton editScheduleButton1 = new ToggleButton("Edit Schedule");
         editScheduleButton1.selectedProperty().bindBidirectional(weekView.editAvailabilityProperty());
         ((Pane) calendarView.getWeekPage().getToolBarControls()).getChildren().add(editScheduleButton1);
-
         // extra button for day page
         ToggleButton editScheduleButton2 = new ToggleButton("Edit Schedule");
         editScheduleButton2.selectedProperty().bindBidirectional(dayView.editAvailabilityProperty());

@@ -106,6 +106,8 @@ public class Entry<T> implements Comparable<Entry<?>> {
 
     private String id;
 
+    private ObjectProperty<String> entryNotes = new SimpleObjectProperty<>();
+
     /**
      * Constructs a new entry with a default time interval. The ID will be generated
      * via {@link UUID#randomUUID()}.
@@ -161,6 +163,18 @@ public class Entry<T> implements Comparable<Entry<?>> {
         setTitle(title);
         setInterval(interval);
         this.id = id;
+        //this.entryNotes = "Enter Text...";
+    }
+    //TD: Constructor that now includes notes field
+    public Entry(String title, Interval interval, String id, String notes) {
+        requireNonNull(title);
+        requireNonNull(interval);
+        requireNonNull(id);
+
+        setTitle(title);
+        setInterval(interval);
+        this.id = id;
+        //this.entryNotes = "Enter Text...";
     }
 
     // A map containing a set of properties for this entry
@@ -320,9 +334,24 @@ public class Entry<T> implements Comparable<Entry<?>> {
      *
      * @param interval the new time interval used by the entry
      */
+
+    public final String getEntryNotes(){
+        if(entryNotes == null) {
+            return null;
+        }
+        else{
+            return entryNotes.get();
+        }
+    }
     public final void setInterval(Interval interval) {
         requireNonNull(interval);
         intervalProperty().set(interval);
+    }
+
+    //TD: Set Notes
+    public final void setNotes(String notes) {
+        requireNonNull(notes);
+        entryNotes.set(notes);
     }
 
     // Set Interval: LocalDate support
@@ -806,6 +835,10 @@ public class Entry<T> implements Comparable<Entry<?>> {
         }
 
         return recurrenceEnd.getReadOnlyProperty();
+    }
+
+    public final ObjectProperty<String> notesProperty(){
+        return entryNotes;
     }
 
     /**

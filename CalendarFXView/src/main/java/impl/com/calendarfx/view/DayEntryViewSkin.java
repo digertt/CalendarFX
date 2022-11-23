@@ -24,6 +24,8 @@ import com.calendarfx.view.DraggedEntry;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.beans.WeakInvalidationListener;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableMap;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
@@ -32,6 +34,8 @@ import javafx.scene.control.Label;
 import javafx.scene.control.SkinBase;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.Region;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 
 import java.time.ZoneId;
@@ -57,11 +61,17 @@ public class DayEntryViewSkin extends SkinBase<DayEntryView> {
     protected Label startTimeLabel;
     protected Label titleLabel;
 
+    protected Label descLabel;
+
+    protected String descText;
+
     private final InvalidationListener updateStylesListener = it -> updateStyles();
     private final WeakInvalidationListener weakUpdateStylesListener = new WeakInvalidationListener(updateStylesListener);
 
     private final InvalidationListener updateLabelsListener = it -> updateLabels();
     private final WeakInvalidationListener weakUpdateLabelsListener = new WeakInvalidationListener(updateLabelsListener);
+
+    private Circle colorDot;
 
     public DayEntryViewSkin(DayEntryView view) {
         super(view);
@@ -74,21 +84,76 @@ public class DayEntryViewSkin extends SkinBase<DayEntryView> {
         titleLabel.setManaged(false);
         titleLabel.setMouseTransparent(true);
 
-        getChildren().addAll(startTimeLabel, titleLabel);
+        descLabel = new Label();
+
+        getEntry().getEntryNotes();
+        descText = (getEntry().getEntryNotes());
+        System.out.println("NOTES: " + descText);
+        if(descText != null){
+            if(descText.length() > 100){
+                descText = (descText.substring(0,97) + "...");
+            }
+            descLabel = new Label(descText);
+            //getChildren().add(descLabel);
+
+        }
+        view.addNode(Pos.BOTTOM_LEFT, descLabel);
+
+        //if(descText.length() > 100){
+           // descText = (descText.substring(0,97) + "...");
+        //}
+        //descLabel = new Label(descText);
+        //getChildren().addAll(startTimeLabel, titleLabel);
+        //getChildren().addAll(titleLabel);
+        view.addNode(Pos.TOP_CENTER, titleLabel);
+
+        //getChildren().add(descLabel);
 
         Entry<?> entry = getEntry();
 
         entry.intervalProperty().addListener(weakUpdateLabelsListener);
         entry.calendarProperty().addListener(weakUpdateStylesListener);
         entry.titleProperty().addListener(weakUpdateLabelsListener);
+        entry.notesProperty().addListener(weakUpdateLabelsListener);
+
+       /* view.focusedProperty().addListener(new ChangeListener<Boolean>() {
+            @Override
+            public void changed(ObservableValue<? extends Boolean> observableValue, Boolean aBoolean, Boolean t1) {
+                System.out.println("Is focused");
+                if(!view.isFocused()){
+                    colorDot.getStyleClass().setAll("default-style-icon-small", getEntry().getCalendar().getStyle() + "-icon-small");
+                }
+                else{
+                    colorDot.setFill(Color.WHITE);
+                }
+            }
+        });
+        */
+
+
 
         getSkinnable().positionProperty().addListener(weakUpdateLabelsListener);
         updateLabels();
+
+        colorDot = new Circle();
+
+        colorDot.setRadius(10);
+        colorDot.setMouseTransparent(true);
+
+        colorDot.setVisible(!entry.isFullDay() && !entry.isMultiDay());
+
+        colorDot.getStyleClass().setAll("default-style-icon-small", getEntry().getCalendar().getStyle() + "-icon-small");
+
+        titleLabel.setGraphic(colorDot);
 
         Rectangle clip = new Rectangle();
         clip.widthProperty().bind(view.widthProperty());
         clip.heightProperty().bind(view.heightProperty());
         view.setClip(clip);
+
+
+
+        //view.addNode(Pos.BOTTOM_LEFT, colorDot);
 
         view.nodesProperty().addListener((Observable it) -> updateNodes());
         updateStyles();
@@ -117,6 +182,8 @@ public class DayEntryViewSkin extends SkinBase<DayEntryView> {
             }
 
             currentlyUsedPositions.forEach(pos -> createPosition(pos, nodes.get(pos)));
+
+            colorDot.getStyleClass().setAll("default-style-icon-small", getEntry().getCalendar().getStyle() + "-icon-small");
         }
 
         if (nodePanes != null && nodePanes.isEmpty()) {
@@ -199,7 +266,11 @@ public class DayEntryViewSkin extends SkinBase<DayEntryView> {
             return;
         }
 
+        colorDot.getStyleClass().setAll("default-style-icon-small", getEntry().getCalendar().getStyle() + "-icon-small");
+
         view.getStyleClass().setAll("default-style-entry", calendar.getStyle() + "-entry");
+
+
 
         if (entry.isRecurrence()) {
             view.getStyleClass().add("recurrence");
@@ -207,6 +278,7 @@ public class DayEntryViewSkin extends SkinBase<DayEntryView> {
 
         view.getStyleClass().addAll(entry.getStyleClass());
 
+        descLabel.getStyleClass().setAll("start-time-label", "default-style-entry-time-label", calendar.getStyle() + "-entry-time-label");
         startTimeLabel.getStyleClass().setAll("start-time-label", "default-style-entry-time-label", calendar.getStyle() + "-entry-time-label");
         titleLabel.getStyleClass().setAll("title-label", "default-style-entry-title-label", calendar.getStyle() + "-entry-title-label");
     }
@@ -271,6 +343,17 @@ public class DayEntryViewSkin extends SkinBase<DayEntryView> {
             startTimeLabel.setText(formatTime(startTime, dateControl.getZoneId()));
         }
         titleLabel.setText(formatTitle(entry.getTitle()));
+        getEntry().getEntryNotes();
+        descText = (getEntry().getEntryNotes());
+        System.out.println("NOTES: " + descText);
+        if(descText != null){
+            if(descText.length() > 100){
+                descText = (descText.substring(0,97) + "...");
+            }
+            descLabel.setText(descText);
+            //getChildren().add(descLabel);
+        }
+
     }
 
     @Override
@@ -281,6 +364,7 @@ public class DayEntryViewSkin extends SkinBase<DayEntryView> {
         // it is guaranteed that we have enough height to display the title (see
         // "computeMinHeight")
         titleLabel.resizeRelocate(snapPositionX(contentX), snapPositionY(contentY), snapSizeX(contentWidth), snapSizeY(titleHeight));
+        //titleLabel.resizeRelocate(1, 1, 1,  1);
 
         // start time label
         double timeLabelHeight = startTimeLabel.prefHeight(contentWidth);

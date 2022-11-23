@@ -26,14 +26,21 @@ import javafx.application.Platform;
 import javafx.scene.Scene;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
-
 import java.time.LocalDate;
 import java.time.LocalTime;
+import javafx.scene.Parent;
+import javafx.fxml.FXMLLoader;
 
 public class CalendarApp extends Application {
 
     @Override
     public void start(Stage primaryStage) {
+
+        login(primaryStage);
+    
+    }
+
+    public void calendar(Stage primaryStage){
         CalendarView calendarView = new CalendarView();
         calendarView.setEnableTimeZoneSupport(true);
 
@@ -104,6 +111,19 @@ public class CalendarApp extends Application {
         primaryStage.setHeight(1000);
         primaryStage.centerOnScreen();
         primaryStage.show();
+        
+    }
+
+    public void login(Stage stage){
+        try{
+            Parent root = FXMLLoader.load(getClass().getResource("login.fxml"));
+            Scene scene = new Scene(root);
+            stage.setScene(scene);
+            stage.show();
+        
+        } catch(Exception e){
+            e.printStackTrace();
+        }
     }
 
     public static void main(String[] args) {

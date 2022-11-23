@@ -78,7 +78,7 @@ class EntriesPane extends VBox {
                 borderPane.getStyleClass().add("entry");
 
                 Label titleLabel = new Label(entry.getTitle());
-                BorderPane.setAlignment(titleLabel, Pos.CENTER_LEFT);
+                borderPane.setAlignment(titleLabel, Pos.CENTER_LEFT);
                 titleLabel.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
                 titleLabel.getStyleClass().add("title");
                 borderPane.setCenter(titleLabel);
@@ -88,6 +88,8 @@ class EntriesPane extends VBox {
                 colorDot.getStyleClass().add(calendar.getStyle() + "-icon-small");
                 titleLabel.setGraphic(colorDot);
 
+
+                /*
                 Label timeLabel = new Label();
                 if (entry.isFullDay()) {
                     timeLabel.setText(Messages.getString("EntriesPane.FULL_DAY"));
@@ -109,7 +111,7 @@ class EntriesPane extends VBox {
 
                 timeLabel.getStyleClass().add("time");
                 BorderPane.setAlignment(timeLabel, Pos.CENTER_RIGHT);
-
+                */
                 getChildren().add(borderPane);
             }
         }

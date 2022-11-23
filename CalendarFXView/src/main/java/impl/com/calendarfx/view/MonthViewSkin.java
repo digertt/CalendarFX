@@ -41,15 +41,11 @@ import javafx.scene.control.Control;
 import javafx.scene.control.Label;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.ColumnConstraints;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.Region;
-import javafx.scene.layout.RowConstraints;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
+import javafx.scene.shape.Polygon;
 import javafx.util.Callback;
 
 import java.text.MessageFormat;
@@ -244,6 +240,7 @@ public class MonthViewSkin extends DateControlSkin<MonthView> implements LoadDat
     }
 
     private void updateView() {
+        System.out.println("HERE!");
         controlsMap.clear();
 
         MonthView view = getSkinnable();
@@ -271,6 +268,7 @@ public class MonthViewSkin extends DateControlSkin<MonthView> implements LoadDat
                 dayOfWeek = dayOfWeek.plus(1);
             }
         }
+
 
         LocalDate date = view.getDate().with(TemporalAdjusters.firstDayOfMonth());
 
@@ -300,7 +298,6 @@ public class MonthViewSkin extends DateControlSkin<MonthView> implements LoadDat
                 } else {
                     dayOfMonthLabel.getStyleClass().add("middle-day");
                 }
-
                 controlsMap.put(date, dayOfMonthLabel);
                 GridPane.setHgrow(dayOfMonthLabel, ALWAYS);
                 GridPane.setVgrow(dayOfMonthLabel, ALWAYS);
@@ -318,6 +315,7 @@ public class MonthViewSkin extends DateControlSkin<MonthView> implements LoadDat
     private int[][] numberOfFullDayEntries;
 
     private void updateEntries(String reason) {
+        System.out.println("UPDATE ENTRIES");
         if (getSkinnable().isSuspendUpdates()) {
             return;
         }
@@ -417,9 +415,13 @@ public class MonthViewSkin extends DateControlSkin<MonthView> implements LoadDat
 
                     Collections.sort(entries);
                     entriesPane.getEntries().setAll(entries);
+
                 }
             }
+
         }
+
+
 
         LoggingDomain.VIEW.fine("updated entries in month view " + getSkinnable().getYearMonth() + ": reason = " + reason);
     }
@@ -487,6 +489,9 @@ public class MonthViewSkin extends DateControlSkin<MonthView> implements LoadDat
         private final MonthDayEntriesPane entriesPane;
 
         private final LocalDate date;
+        public final Polygon flag = new Polygon(0.0d, 0.0d,
+                25.0d, 0.0d,
+                0.0d, 25.0d);
 
         MonthDayView(LocalDate date, int week, int day) {
             this.date = date;
@@ -562,9 +567,13 @@ public class MonthViewSkin extends DateControlSkin<MonthView> implements LoadDat
                 getStyleClass().add(WEEKEND_DAY);
                 dateLabel.getStyleClass().add(WEEKEND_DAY);
             }
-
             getStyleClass().add(dayOfWeek.toString().toLowerCase());
+            BorderPane flagPane = new BorderPane();
 
+            flag.setFill(Color.LIGHTGREY);
+            flagPane.setLeft(flag);
+            VBox.setVgrow(flagPane, Priority.NEVER);
+            getChildren().add(flagPane);
             BorderPane headerPane = new BorderPane();
             headerPane.getStyleClass().add(MONTH_DAY_HEADER);
             if (monthView.isShowWeekNumbers()) {
@@ -572,9 +581,9 @@ public class MonthViewSkin extends DateControlSkin<MonthView> implements LoadDat
             }
             headerPane.setRight(dateLabel);
 
+
             VBox.setVgrow(headerPane, Priority.NEVER);
             getChildren().add(headerPane);
-
             entriesPane = new MonthDayEntriesPane(date, week, day);
             entriesPane.getStyleClass().add(MONTH_DAY_ENTRIES_PANE);
             VBox.setVgrow(entriesPane, Priority.ALWAYS);
@@ -621,7 +630,16 @@ public class MonthViewSkin extends DateControlSkin<MonthView> implements LoadDat
         private final int week;
         private final int day;
 
+        public Polygon entryFlag;
+
+        private VBox outerBox;
+
+        private BorderPane flagPane;
+
         MonthDayEntriesPane(LocalDate date, int week, int day) {
+
+
+
             getStyleClass().add("entries-pane");
 
             this.date = date;
@@ -649,8 +667,16 @@ public class MonthViewSkin extends DateControlSkin<MonthView> implements LoadDat
                 moreLabel.setOnMouseClicked(evt -> fireEvent(new RequestEvent(this, this, date)));
             }
 
+            /*
             getChildren().add(moreLabel);
+            VBox outerBox = (VBox)getParent();
+            BorderPane flagPane = (BorderPane) outerBox.getChildren().get(0);
+            Polygon flag = (Polygon)(flagPane.getChildren().get(0));
+             */
+
+            System.out.println(getParent());
         }
+
 
         private final ObservableList<Entry<?>> entries = FXCollections.observableArrayList();
 
@@ -658,8 +684,65 @@ public class MonthViewSkin extends DateControlSkin<MonthView> implements LoadDat
             return entries;
         }
 
-        private void update() {
+        public void updateFlag(){
+            VBox parentVBox = (VBox)getParent();
+            System.out.println(parentVBox.getChildren().get(0));
+            BorderPane flagPane = (BorderPane) parentVBox.getChildren().get(0);
+            System.out.println(flagPane.getChildren().get(0));
+            Polygon flag = (Polygon)(flagPane.getChildren().get(0));
+
+            int posCount = 0;
+            int milCount = 0;
+            int negCount = 0;
+            int trgCount = 0;
+
+            if(entries.isEmpty()){
+                flag.setFill(Color.LIGHTGREY);
+            }
+
+            else {
+                for (Entry<?> entry : entries) {
+                    switch (entry.getCalendar().getName()) {
+                        case "Positive":
+                            posCount++;
+                            break;
+                        case "Mild Negative":
+                            milCount++;
+                            break;
+                        case "Negative":
+                            negCount++;
+                            break;
+                        case "Trigger Event":
+                            trgCount++;
+                            break;
+                        default:
+                            break;
+                    }
+                }
+
+                if ((posCount > milCount) && (posCount > negCount) && (posCount > trgCount)) {
+                    flag.setFill(Color.LIGHTGREEN);
+                } else if ((milCount > posCount) && (milCount > negCount) && (milCount > trgCount)) {
+                    flag.setFill(Color.BLUE);
+                } else if ((negCount > milCount) && (negCount > posCount) && (negCount > trgCount)) {
+                    flag.setFill(Color.YELLOW);
+                } else if ((trgCount > milCount) && (trgCount > posCount) && (trgCount > negCount)) {
+                    flag.setFill(Color.PURPLE);
+                }
+            }
+        }
+
+        public void update() {
+
+
+
+
             Util.removeChildren(this, node -> node instanceof MonthEntryView);
+
+            /////
+
+
+            ///////
 
             if (!entries.isEmpty()) {
 
@@ -708,12 +791,18 @@ public class MonthViewSkin extends DateControlSkin<MonthView> implements LoadDat
                  * Individual calendars are already sorted, but now we are
                  * displaying entries from several calendars, so let's resort.
                  */
+
+
                 Collections.sort(otherEntries);
+
 
                 for (Entry<?> entry : otherEntries) {
                     getChildren().add(createNode(entry));
                 }
+                //flag.setFill(Color.GREEN);
+
             }
+            updateFlag();
         }
 
         private Node createNode(Entry<?> entry) {
@@ -724,6 +813,7 @@ public class MonthViewSkin extends DateControlSkin<MonthView> implements LoadDat
             view.getProperties().put("endDate", date);
 
             Position position = Position.ONLY;
+
 
             if (entry.isFullDay()) {
                 if (date.isBefore(entry.getEndDate()) && (day == 0 || (date.equals(entry.getStartDate())))) {
@@ -743,6 +833,7 @@ public class MonthViewSkin extends DateControlSkin<MonthView> implements LoadDat
                 }
             }
 
+
             view.getProperties().put("position", position);
 
             return view;
@@ -751,9 +842,11 @@ public class MonthViewSkin extends DateControlSkin<MonthView> implements LoadDat
         @Override
         protected void layoutChildren() {
             Insets insets = getInsets();
-            double w = getWidth();
+            //double w = getWidth();
+
             double h = getHeight();
             double y = insets.getTop();
+            double w = 35;
 
             moreLabel.setVisible(false);
 
@@ -813,3 +906,4 @@ public class MonthViewSkin extends DateControlSkin<MonthView> implements LoadDat
         return null;
     }
 }
+
