@@ -701,6 +701,7 @@ public class MonthViewSkin extends DateControlSkin<MonthView> implements LoadDat
             }
 
             else {
+                String tieBreak = entries.get(0).getCalendar().getName();
                 for (Entry<?> entry : entries) {
                     switch (entry.getCalendar().getName()) {
                         case "Positive":
@@ -728,6 +729,20 @@ public class MonthViewSkin extends DateControlSkin<MonthView> implements LoadDat
                     flag.setFill(Color.YELLOW);
                 } else if ((trgCount > milCount) && (trgCount > posCount) && (trgCount > negCount)) {
                     flag.setFill(Color.PURPLE);
+                }
+                else{
+                    if(tieBreak == "Positive"){
+                        flag.setFill(Color.LIGHTGREEN);
+                    }
+                    if(tieBreak == "Mild Negative"){
+                        flag.setFill(Color.BLUE);
+                    }
+                    if(tieBreak == "Negative"){
+                        flag.setFill(Color.YELLOW);
+                    }
+                    if(tieBreak == "Trigger Event"){
+                        flag.setFill(Color.PURPLE);
+                    }
                 }
             }
         }
@@ -892,7 +907,7 @@ public class MonthViewSkin extends DateControlSkin<MonthView> implements LoadDat
                         snapSizeX(w - insets.getRight() - insets.getLeft()),
                         snapSizeY(ph));
             }
-        }           
+        }
     }
 
     public ZonedDateTime getZonedDateTimeAt(double x, double y, ZoneId zoneId) {
