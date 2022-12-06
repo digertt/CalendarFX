@@ -25,7 +25,7 @@ public class Controller {
     private Stage primaryStage;
 
     public void switchToIntroOne(ActionEvent event) throws IOException {
-        root = FXMLLoader.load(getClass().getResource("Intro1.fxml"));
+        root = FXMLLoader.load(getClass().getClassLoader().getResource("Intro1.fxml"));
         stage = (Stage)((Node)event.getSource()).getScene().getWindow();
         scene = new Scene(root);
         stage.setScene(scene);
@@ -33,7 +33,7 @@ public class Controller {
     }
 
     public void switchToIntroTwo(ActionEvent event) throws IOException {
-        root = FXMLLoader.load(getClass().getResource("Intro2.fxml"));
+        root = FXMLLoader.load(getClass().getClassLoader().getResource("Intro2.fxml"));
         stage = (Stage)((Node)event.getSource()).getScene().getWindow();
         scene = new Scene(root);
         stage.setScene(scene);
@@ -41,7 +41,7 @@ public class Controller {
     }
 
     public void switchToIntroThree(ActionEvent event) throws IOException {
-        root = FXMLLoader.load(getClass().getResource("Intro3.fxml"));
+        root = FXMLLoader.load(getClass().getClassLoader().getResource("Intro3.fxml"));
         stage = (Stage)((Node)event.getSource()).getScene().getWindow();
         scene = new Scene(root);
         stage.setScene(scene);
@@ -49,7 +49,7 @@ public class Controller {
     }
 
     public void switchToIntroFour(ActionEvent event) throws IOException {
-        root = FXMLLoader.load(getClass().getResource("Intro4.fxml"));
+        root = FXMLLoader.load(getClass().getClassLoader().getResource("Intro4.fxml"));
         stage = (Stage)((Node)event.getSource()).getScene().getWindow();
         scene = new Scene(root);
         stage.setScene(scene);
